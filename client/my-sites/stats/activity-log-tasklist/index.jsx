@@ -200,7 +200,7 @@ class ActivityLogTasklist extends Component {
 				site: siteName,
 			} ),
 			{
-				id: plugin.slug,
+				id: `alpluginupdate-${ plugin.slug }`,
 				showDismiss: false,
 			}
 		);
@@ -265,7 +265,7 @@ class ActivityLogTasklist extends Component {
 							error: updateStatus,
 						} ),
 						{
-							id: pluginSlug,
+							id: `alpluginupdate-${ pluginSlug }`,
 							button: translate( 'Try again' ),
 							onClick: () => this.enqueuePlugin( plugin, 'notice' ),
 						}
@@ -276,7 +276,7 @@ class ActivityLogTasklist extends Component {
 					showSuccessNotice(
 						PluginNotices.successMessage( 'UPDATE_PLUGIN', '1 site 1 plugin', pluginData ),
 						{
-							id: pluginSlug,
+							id: `alpluginupdate-${ pluginSlug }`,
 							duration: 3000,
 						}
 					);
