@@ -18,7 +18,6 @@ import ActionCard from 'components/action-card';
 import Button from 'components/button';
 import Card from 'components/card';
 import CardHeading from 'components/card-heading';
-import config from 'config';
 import DocumentHead from 'components/data/document-head';
 import ExternalLink from 'components/external-link';
 import { getSelectedSiteId, getSelectedSiteSlug } from 'state/ui/selectors';
@@ -32,6 +31,7 @@ import { recordTracksEvent } from 'state/analytics/actions';
 import QuerySiteKeyrings from 'components/data/query-site-keyrings';
 import QueryKeyringConnections from 'components/data/query-keyring-connections';
 import { isJetpackSite } from 'state/sites/selectors';
+import { connectGoogleMyBusinessAccount } from 'state/google-my-business/actions';
 
 class GoogleMyBusinessSelectBusinessType extends Component {
 	static propTypes = {
@@ -47,8 +47,8 @@ class GoogleMyBusinessSelectBusinessType extends Component {
 		page.back( `/stats/day/${ this.props.siteSlug }` );
 	};
 
-	handleConnect = () => {
-		const { googleMyBusinessLocations, siteSlug } = this.props;
+	handleConnect = keyringConnection => {
+		const { googleMyBusinessLocations, siteId, siteSlug } = this.props;
 
 		const locationCount = googleMyBusinessLocations.length;
 		const verifiedLocationCount = googleMyBusinessLocations.filter( location => {
@@ -60,11 +60,13 @@ class GoogleMyBusinessSelectBusinessType extends Component {
 			verified_location_count: verifiedLocationCount,
 		} );
 
-		if ( locationCount === 0 ) {
-			page.redirect( `/google-my-business/new/${ siteSlug }` );
-		} else {
-			page.redirect( `/google-my-business/select-location/${ siteSlug }` );
-		}
+		this.props.connectGoogleMyBusinessAccount( siteId, keyringConnection.ID ).then( () => {
+			if ( locationCount === 0 ) {
+				page.redirect( `/google-my-business/new/${ siteSlug }` );
+			} else {
+				page.redirect( `/google-my-business/select-location/${ siteSlug }` );
+			}
+		} );
 	};
 
 	trackCreateYourListingClick = () => {
@@ -96,7 +98,7 @@ class GoogleMyBusinessSelectBusinessType extends Component {
 
 		let connectButton;
 
-		if ( config.isEnabled( 'google-my-business' ) && canUserManageOptions ) {
+		if ( canUserManageOptions ) {
 			connectButton = (
 				<KeyringConnectButton
 					serviceId="google_my_business"
@@ -238,6 +240,7 @@ export default connect(
 		};
 	},
 	{
+		connectGoogleMyBusinessAccount,
 		recordTracksEvent,
 	}
 )( localize( GoogleMyBusinessSelectBusinessType ) );

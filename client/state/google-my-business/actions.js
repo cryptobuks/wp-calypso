@@ -8,23 +8,33 @@ import {
 	GOOGLE_MY_BUSINESS_STATS_RECEIVE,
 	GOOGLE_MY_BUSINESS_STATS_REQUEST,
 } from 'state/action-types';
-import { saveSiteKeyring, deleteSiteKeyring } from 'state/site-keyrings/actions';
+import {
+	createSiteKeyring,
+	updateSiteKeyring,
+	deleteSiteKeyring,
+} from 'state/site-keyrings/actions';
 
-export const connectGoogleMyBusinessLocation = (
+export const connectGoogleMyBusinessAccount = (
 	siteId,
-	keyringConnectionId,
-	locationId
+	keyringId,
+	locationId = null
 ) => dispatch =>
 	dispatch(
-		saveSiteKeyring( siteId, {
-			keyring_id: keyringConnectionId,
-			external_user_id: locationId,
+		createSiteKeyring( siteId, {
+			keyring_id: keyringId,
 			service: 'google_my_business',
+			external_user_id: locationId,
 		} )
 	);
 
-export const disconnectGoogleMyBusinessLocation = ( siteId, keyringSiteId ) => dispatch =>
-	dispatch( deleteSiteKeyring( siteId, keyringSiteId ) );
+export const disconnectGoogleMyBusinessAccount = ( siteId, keyringId ) => dispatch =>
+	dispatch( deleteSiteKeyring( siteId, keyringId ) );
+
+export const connectGoogleMyBusinessLocation = ( siteId, keyringId, locationId ) => dispatch =>
+	dispatch( updateSiteKeyring( siteId, keyringId, locationId ) );
+
+export const disconnectGoogleMyBusinessLocation = ( siteId, keyringId ) => dispatch =>
+	dispatch( updateSiteKeyring( siteId, keyringId, null ) );
 
 export const requestGoogleMyBusinessStats = (
 	siteId,

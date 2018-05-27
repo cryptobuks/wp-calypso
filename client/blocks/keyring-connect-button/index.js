@@ -6,7 +6,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { isEqual, noop, some } from 'lodash';
+import { differenceBy, isEqual, last, noop, some } from 'lodash';
 import { localize } from 'i18n-calypso';
 
 /**
@@ -88,13 +88,13 @@ class KeyringConnectButton extends Component {
 	}
 
 	performAction = () => {
-		const { forceReconnect } = this.props;
+		const { forceReconnect, keyringConnections } = this.props;
 		const connectionStatus = this.getConnectionStatus();
 
 		// Depending on current status, perform an action when user clicks the
 		// service action button
 		if ( 'connected' === connectionStatus && ! forceReconnect ) {
-			this.props.onConnect();
+			this.props.onConnect( last( keyringConnections ) );
 		} else {
 			this.addConnection();
 		}
@@ -140,7 +140,12 @@ class KeyringConnectButton extends Component {
 
 		if ( this.didKeyringConnectionSucceed( nextProps.keyringConnections ) ) {
 			this.setState( { isConnecting: false } );
-			this.props.onConnect();
+			const newKeyringConnection = differenceBy(
+				this.props.keyringConnections,
+				nextProps.keyringConnections,
+				'ID'
+			);
+			this.props.onConnect( newKeyringConnection );
 		}
 	}
 
